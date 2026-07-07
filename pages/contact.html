@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVOLAZA | Contact</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="grain"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../images/avolaza-emblem-light.png" alt="" class="logo-seal-img">
+                AVOLAZA
+            </a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Accueil</a></li>
+                <li><a href="services.html" class="nav-link">Nos Services</a></li>
+                <li><a href="produits.html" class="nav-link">Nos Produits</a></li>
+                <li><a href="apropos.html" class="nav-link">À Propos</a></li>
+                <li><a href="contact.html" class="nav-link active">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="#connexion" class="btn-signin">Se connecter</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="contact-page">
+
+        <header class="page-head animate-in" style="--d:0s">
+            <p class="eyebrow">Nous joindre</p>
+            <h1 class="page-title">Contact</h1>
+            <p class="page-intro">Une question sur un service, une commande à passer, un projet en tête ? Écrivez-nous, un membre d'AVOLAZA vous répond sous peu.</p>
+        </header>
+
+        <div class="contact-layout">
+
+            <div class="contact-plaque contact-info animate-in" style="--d:.1s">
+                <h2>Coordonnées</h2>
+                <ul class="contact-list">
+                    <li>
+                        <span class="contact-label">Téléphone</span>
+                        <span class="contact-value"><a href="tel:+261340000000">+261 34 92 479 66</a></span>
+                    </li>
+                    <li>
+                        <span class="contact-label">Email</span>
+                        <span class="contact-value"><a href="mailto:contact@avolaza.mg">contact@avolaza.mg</a></span>
+                    </li>
+                    <li>
+                        <span class="contact-label">Adresse</span>
+                        <span class="contact-value">Manakara, Madagascar</span>
+                    </li>
+                    <li>
+                        <span class="contact-label">Horaires</span>
+                        <span class="contact-value">Lundi – Vendredi, 8h – 17h</span>
+                    </li>
+                </ul>
+
+                <hr class="contact-divider">
+
+                <span class="contact-label">Suivez-nous</span>
+                <div class="contact-social" style="margin-top: 12px;">
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">WhatsApp</a>
+                </div>
+            </div>
+
+            <div class="contact-plaque contact-form animate-in" style="--d:.2s">
+                <h2>Envoyer un message</h2>
+                <form action="#" method="POST">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="nom">Nom</label>
+                            <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="vous@exemple.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Ce qui vous intéresse</label>
+                        <div class="type-toggle" role="group" aria-label="Type de demande">
+                            <button type="button" class="type-toggle-btn active" data-type="service">Un service</button>
+                            <button type="button" class="type-toggle-btn" data-type="produit">Un produit</button>
+                        </div>
+                    </div>
+
+                    <div class="form-field" id="service-field">
+                        <label for="service-select">Sélectionner un service</label>
+                        <select id="service-select" name="service">
+                            <option value="">Choisir un service...</option>
+                            <option value="informatique">Service Informatique</option>
+                            <option value="topographique">Service Topographique</option>
+                            <option value="btp">Service BTP</option>
+                            <option value="immobilier">Atelier Immobilier</option>
+                            <option value="agronomie">Agronomie &amp; Élevage</option>
+                            <option value="langue">Cours de Langue</option>
+                            <option value="autre">Autre demande</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field" id="produit-field" hidden>
+                        <label for="produit-select">Sélectionner un produit</label>
+                        <select id="produit-select" name="produit" disabled>
+                            <option value="">Choisir un produit...</option>
+                            <option value="rhum">Rhum AVOLAZA</option>
+                            <option value="huile-coco">Huile Coco AVOLAZA</option>
+                            <option value="miel">Miel AVOLAZA</option>
+                            <option value="cafe">Café AVOLAZA</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Décrivez votre demande..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Envoyer le message</button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            var buttons = document.querySelectorAll('.type-toggle-btn');
+            var serviceField = document.getElementById('service-field');
+            var produitField = document.getElementById('produit-field');
+            var serviceSelect = document.getElementById('service-select');
+            var produitSelect = document.getElementById('produit-select');
+
+            buttons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    buttons.forEach(function (b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+
+                    var isService = btn.dataset.type === 'service';
+                    serviceField.hidden = !isService;
+                    produitField.hidden = isService;
+
+                    // only the visible field should be submitted
+                    serviceSelect.disabled = !isService;
+                    produitSelect.disabled = isService;
+                });
+            });
+        })();
+    </script>
+
+</body>
+</html>
