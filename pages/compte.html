@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVOLAZA | Mon compte</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="grain"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <img src="../images/avolaza-emblem-light.png" alt="" class="logo-seal-img">
+                AVOLAZA
+            </a>
+            <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-menu-wrapper">
+                <ul class="nav-menu">
+                    <li><a href="../index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="services.html" class="nav-link">Nos Services</a></li>
+                    <li><a href="produits.html" class="nav-link">Nos Produits</a></li>
+                    <li><a href="apropos.html" class="nav-link">À Propos</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                </ul>
+
+                <div class="nav-actions" data-login-href="login.html" data-account-href="compte.html">
+                    <a href="login.html" class="btn-signin">Se connecter</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="nav-overlay"></div>
+
+    <main class="auth-page">
+
+        <!-- Visible si non connecté : invite à se connecter via la popup -->
+        <div class="auth-shell animate-in" style="--d:0s" id="guestShell" hidden>
+            <p class="eyebrow">Espace client</p>
+            <h1 class="auth-shell-title">Mon compte</h1>
+            <p class="auth-shell-intro">Connectez-vous pour accéder à votre espace AVOLAZA.</p>
+            <div class="auth-card" style="text-align:center;">
+                <button type="button" class="btn-submit" id="openLoginBtn">Se connecter</button>
+            </div>
+            <p class="auth-switch">Pas encore de compte ? <a href="register.html">Créer un compte</a></p>
+        </div>
+
+        <!-- Visible si connecté -->
+        <div class="auth-shell animate-in" style="--d:0s" id="accountShell" hidden>
+            <div class="account-avatar" id="accountAvatar"></div>
+            <h1 class="auth-shell-title" id="accountName"></h1>
+            <p class="auth-shell-intro" id="accountEmail"></p>
+            <div class="auth-card account-card">
+                <span class="contact-label">Statut</span>
+                <p class="account-status">Compte actif</p>
+                <button type="button" class="btn-submit" id="logoutBtn">Se déconnecter</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/nav.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        (function () {
+            var guestShell = document.getElementById('guestShell');
+            var accountShell = document.getElementById('accountShell');
+
+            function initials(nom) {
+                return (nom || '').trim().split(/\s+/).slice(0, 2).map(function (w) {
+                    return w.charAt(0).toUpperCase();
+                }).join('') || '?';
+            }
+
+            function render() {
+                var user = window.AvolazaAuth.getCurrentUser();
+                if (user) {
+                    guestShell.hidden = true;
+                    accountShell.hidden = false;
+                    document.getElementById('accountAvatar').textContent = initials(user.nom);
+                    document.getElementById('accountName').textContent = user.nom;
+                    document.getElementById('accountEmail').textContent = user.email;
+                } else {
+                    accountShell.hidden = true;
+                    guestShell.hidden = false;
+                }
+            }
+
+            render();
+
+            // Si l'utilisateur arrive ici sans être connecté, on ouvre directement
+            // la popup de connexion plutôt que de le rediriger vers une autre page.
+            if (!window.AvolazaAuth.getCurrentUser()) {
+                window.AvolazaAuth.openModal('login');
+            }
+
+            document.getElementById('openLoginBtn').addEventListener('click', function () {
+                window.AvolazaAuth.openModal('login');
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                window.AvolazaAuth.logoutUser();
+                window.AvolazaAuth.notifyAuthChange();
+            });
+
+            // Se met à jour dès qu'une connexion/inscription/déconnexion a lieu,
+            // sans recharger la page.
+            window.addEventListener('avolaza:authchange', render);
+        })();
+    </script>
+</body>
+</html>

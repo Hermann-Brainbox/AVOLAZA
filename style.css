@@ -1169,6 +1169,227 @@ body.nav-open { overflow: hidden; }
 }
 
 /* =========================================================
+   AUTH PAGES — connexion / inscription / compte
+   Design compact, centré verticalement — plus de pleine largeur.
+   ========================================================= */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 140px 24px 80px;
+    background:
+        radial-gradient(ellipse 900px 500px at 50% 0%, rgba(201,162,39,0.06), transparent 70%),
+        var(--noir);
+}
+
+.auth-shell {
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.auth-shell .eyebrow { justify-content: center; }
+
+.auth-shell-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    color: var(--cream);
+    letter-spacing: 0.02em;
+    margin-top: 10px;
+}
+
+.auth-shell-intro {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin-top: 12px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.auth-card {
+    background: linear-gradient(180deg, var(--charcoal-light), var(--charcoal));
+    border: 1px solid var(--line-soft);
+    border-radius: 2px;
+    padding: 34px 30px;
+    text-align: left;
+}
+
+.form-message {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    padding: 13px 16px;
+    border-radius: 2px;
+    margin-bottom: 22px;
+}
+
+.form-message.error {
+    background: rgba(201, 60, 60, 0.12);
+    border: 1px solid rgba(201, 60, 60, 0.4);
+    color: #f3b4b4;
+}
+
+.form-message.success {
+    background: rgba(120, 201, 80, 0.12);
+    border: 1px solid rgba(120, 201, 80, 0.4);
+    color: #c8f0b0;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.auth-switch a {
+    color: var(--gold-bright);
+    border-bottom: 1px solid rgba(240, 208, 120, 0.4);
+    cursor: pointer;
+}
+
+.auth-switch a:hover { border-color: var(--gold-bright); }
+
+/* avatar rond avec initiales, sur la page "Mon compte" */
+.account-avatar {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--gold-bright), var(--gold));
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--noir);
+}
+
+.account-card {
+    text-align: center;
+}
+
+.account-card .account-status {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 26px;
+}
+
+@media (max-width: 480px) {
+    .auth-page { padding: 120px 20px 60px; }
+    .auth-card { padding: 28px 22px; }
+}
+
+/* =========================================================
+   POPUP DE CONNEXION — accessible depuis "Se connecter" sur
+   toutes les pages du site.
+   ========================================================= */
+.auth-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease);
+    z-index: 90;
+}
+
+.auth-modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.auth-modal {
+    position: relative;
+    width: min(400px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: linear-gradient(180deg, var(--charcoal-light), var(--charcoal));
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 38px 32px 32px;
+    transform: translateY(16px);
+    transition: transform 0.35s var(--ease);
+}
+
+.auth-modal-overlay.open .auth-modal {
+    transform: translateY(0);
+}
+
+.auth-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--cream);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+}
+
+.auth-modal-close:hover,
+.auth-modal-close:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold-bright);
+}
+
+.auth-modal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+    padding-right: 34px;
+}
+
+.auth-tab {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    background: var(--charcoal);
+    border: 1px solid var(--line-soft);
+    border-radius: 2px;
+    padding: 11px 10px;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+}
+
+.auth-tab:hover { border-color: var(--line); color: var(--cream); }
+
+.auth-tab.active {
+    background: rgba(201, 162, 39, 0.12);
+    border-color: var(--gold);
+    color: var(--gold-bright);
+}
+
+.auth-tab:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
+}
+
+.auth-modal-form[hidden] { display: none; }
+
+@media (max-width: 480px) {
+    .auth-modal { padding: 32px 22px 26px; }
+}
+
+/* =========================================================
    A PROPOS PAGE
    ========================================================= */
 .apropos-page {
