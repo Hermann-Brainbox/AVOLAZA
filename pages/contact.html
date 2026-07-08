@@ -149,9 +149,13 @@
                     serviceField.hidden = !isService;
                     produitField.hidden = isService;
 
-                    // only the visible field should be submitted
+                    // Désactive le champ invisible pour qu'il ne soit pas soumis
                     serviceSelect.disabled = !isService;
                     produitSelect.disabled = isService;
+
+                    // CORRECTION DU BUG 405 : On ajuste l'obligation du champ dynamiquement
+                    serviceSelect.required = isService;
+                    produitSelect.required = !isService;
                 });
             });
         })();
