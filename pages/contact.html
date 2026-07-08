@@ -75,7 +75,7 @@
 
             <div class="contact-plaque contact-form animate-in" style="--d:.2s">
                 <h2>Envoyer un message</h2>
-                <form action="#" method="POST">
+                <form action="https://formspree.io/f/xaqgbwzp" method="POST">
                     <div class="form-row">
                         <div class="form-field">
                             <label for="nom">Nom</label>
@@ -97,8 +97,8 @@
 
                     <div class="form-field" id="service-field">
                         <label for="service-select">Sélectionner un service</label>
-                        <select id="service-select" name="service">
-                            <option value="">Choisir un service...</option>
+                        <select id="service-select" name="service" required>
+                            <option value="" disabled selected>Choisir un service...</option>
                             <option value="informatique">Service Informatique</option>
                             <option value="topographique">Service Topographique</option>
                             <option value="btp">Service BTP</option>
@@ -111,8 +111,8 @@
 
                     <div class="form-field" id="produit-field" hidden>
                         <label for="produit-select">Sélectionner un produit</label>
-                        <select id="produit-select" name="produit" disabled>
-                            <option value="">Choisir un produit...</option>
+                        <select id="produit-select" name="produit" disabled required>
+                            <option value="" disabled selected>Choisir un produit...</option>
                             <option value="rhum">Rhum AVOLAZA</option>
                             <option value="huile-coco">Huile Coco AVOLAZA</option>
                             <option value="miel">Miel AVOLAZA</option>
