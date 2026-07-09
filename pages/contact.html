@@ -133,6 +133,7 @@
                     </div>
 
                     <button type="submit" class="btn-submit">Envoyer le message</button>
+                    <p class="auth-switch" style="margin-top:16px; text-align:left;">La connexion est demandée avant l'envoi, pour assurer le suivi de votre demande.</p>
                 </form>
             </div>
 
@@ -169,6 +170,38 @@
     </script>
 
     <script src="../js/nav.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/auth.js"></script>
+    <script>
+        (function () {
+            var form = document.querySelector('.contact-form form');
+            var pendingSubmit = false;
+
+            // On bloque l'envoi tant que la personne n'est pas connectée :
+            // la popup s'ouvre, et l'envoi se fait automatiquement une fois
+            // connectée, sans qu'elle ait à re-cliquer sur "Envoyer".
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                window.AvolazaAuth.getCurrentUser().then(function (user) {
+                    if (user) {
+                        form.submit();
+                    } else {
+                        pendingSubmit = true;
+                        window.AvolazaAuth.openModal('login');
+                    }
+                });
+            });
+
+            window.addEventListener('avolaza:authchange', function () {
+                if (!pendingSubmit) return;
+                window.AvolazaAuth.getCurrentUser().then(function (user) {
+                    if (user) {
+                        pendingSubmit = false;
+                        form.submit();
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

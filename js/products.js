@@ -8,16 +8,19 @@
         var photoWrap = document.getElementById('productModalPhoto');
         var nameEl = document.getElementById('productModalName');
         var tagEl = document.getElementById('productModalTag');
+        var priceEl = document.getElementById('productModalPrice');
         var descEl = document.getElementById('productModalDesc');
 
         function openModal(card) {
             var name = card.getAttribute('data-name') || '';
             var tag = card.getAttribute('data-tag') || '';
+            var price = card.getAttribute('data-price') || '';
             var desc = card.getAttribute('data-desc') || '';
             var img = card.getAttribute('data-img') || '';
 
             nameEl.textContent = name;
             tagEl.textContent = tag;
+            priceEl.textContent = price;
             descEl.textContent = desc;
 
             photoWrap.classList.remove('photo-missing');

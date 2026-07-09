@@ -1,43 +1,34 @@
 /*
- * AVOLAZA — mini système de compte côté client.
- * IMPORTANT : ceci est un système de démonstration. Les comptes sont stockés
- * dans le navigateur (localStorage), pas sur un serveur. Il ne faut PAS
- * l'utiliser tel quel pour de vraies données sensibles en production —
- * pour un vrai site, il faudra un backend (ex: Firebase, Supabase, ou une
- * API maison) qui stocke les comptes côté serveur.
+ * AVOLAZA — système de compte, propulsé par Supabase Auth.
+ *
+ * CONFIGURATION REQUISE : remplace les deux valeurs ci-dessous par
+ * celles de ton projet Supabase (Project Settings → API).
  */
 (function () {
-    var STORAGE_KEY = 'avolaza_users';
-    var SESSION_KEY = 'avolaza_session';
+    var SUPABASE_URL = 'https://axrrvoufvifcyqdzebdr.supabase.co';
+    var SUPABASE_ANON_KEY = 'sb_publishable_GWA79gbgcWsImmQLWuA9dA_01AImuoh';
 
-    async function hash(text) {
-        var enc = new TextEncoder().encode(text);
-        var buf = await crypto.subtle.digest('SHA-256', enc);
-        return Array.from(new Uint8Array(buf)).map(function (b) {
-            return b.toString(16).padStart(2, '0');
-        }).join('');
-    }
+    var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function getUsers() {
-        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-        catch (e) { return []; }
-    }
-
-    function saveUsers(users) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-    }
-
-    function getSession() {
-        try { return JSON.parse(localStorage.getItem(SESSION_KEY)); }
-        catch (e) { return null; }
-    }
-
-    function setSession(email) {
-        localStorage.setItem(SESSION_KEY, JSON.stringify({ email: email }));
-    }
-
-    function clearSession() {
-        localStorage.removeItem(SESSION_KEY);
+    // Traduit les messages d'erreur Supabase (en anglais) en français.
+    function translateError(error) {
+        var msg = (error && error.message) || '';
+        if (/already registered|already exists/i.test(msg)) {
+            return 'Un compte existe déjà avec cet email.';
+        }
+        if (/invalid login credentials/i.test(msg)) {
+            return 'Email ou mot de passe incorrect.';
+        }
+        if (/email not confirmed/i.test(msg)) {
+            return 'Merci de confirmer votre email avant de vous connecter (vérifiez votre boîte mail).';
+        }
+        if (/password should be at least/i.test(msg)) {
+            return 'Le mot de passe doit contenir au moins 6 caractères.';
+        }
+        if (/unable to validate email address|invalid email/i.test(msg)) {
+            return 'Adresse email invalide.';
+        }
+        return msg || "Une erreur est survenue. Merci de réessayer.";
     }
 
     async function registerUser(nom, email, password) {
@@ -49,35 +40,70 @@
         if (password.length < 6) {
             throw new Error('Le mot de passe doit contenir au moins 6 caractères.');
         }
-        var users = getUsers();
-        if (users.some(function (u) { return u.email === email; })) {
-            throw new Error('Un compte existe déjà avec cet email.');
-        }
-        var passwordHash = await hash(password);
-        users.push({ nom: nom, email: email, passwordHash: passwordHash });
-        saveUsers(users);
-        setSession(email);
+
+        var result = await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+            options: { data: { nom: nom } }
+        });
+
+        if (result.error) throw new Error(translateError(result.error));
+
+        // Si la confirmation par email est activée dans Supabase, aucune
+        // session n'est ouverte tant que le lien reçu par mail n'a pas été cliqué.
+        return { needsConfirmation: !result.data.session };
     }
 
     async function loginUser(email, password) {
         email = (email || '').trim().toLowerCase();
-        var users = getUsers();
-        var user = users.find(function (u) { return u.email === email; });
-        if (!user) throw new Error('Aucun compte trouvé avec cet email.');
-        var passwordHash = await hash(password || '');
-        if (passwordHash !== user.passwordHash) throw new Error('Mot de passe incorrect.');
-        setSession(email);
+        var result = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        if (result.error) throw new Error(translateError(result.error));
     }
 
-    function logoutUser() {
-        clearSession();
+    async function logoutUser() {
+        await supabaseClient.auth.signOut();
     }
 
-    function getCurrentUser() {
-        var session = getSession();
+    // Calcule l'URL absolue de la page reset-password.html, où que se
+    // trouve la page actuelle (racine ou dossier /pages/), en réutilisant
+    // le même repère que data-login-href sur .nav-actions.
+    function getResetRedirectUrl() {
+        var actions = document.querySelector('.nav-actions');
+        var loginHref = (actions && actions.getAttribute('data-login-href')) || 'pages/login.html';
+        var relative = loginHref.replace('login.html', 'reset-password.html');
+        return new URL(relative, window.location.href).href;
+    }
+
+    async function requestPasswordReset(email) {
+        email = (email || '').trim().toLowerCase();
+        if (!email) throw new Error('Merci de renseigner votre email.');
+
+        var result = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: getResetRedirectUrl()
+        });
+        if (result.error) throw new Error(translateError(result.error));
+    }
+
+    async function updatePassword(newPassword) {
+        if (!newPassword || newPassword.length < 6) {
+            throw new Error('Le mot de passe doit contenir au moins 6 caractères.');
+        }
+        var result = await supabaseClient.auth.updateUser({ password: newPassword });
+        if (result.error) throw new Error(translateError(result.error));
+    }
+
+    async function getCurrentUser() {
+        var result = await supabaseClient.auth.getSession();
+        var session = result.data && result.data.session;
         if (!session) return null;
-        var users = getUsers();
-        return users.find(function (u) { return u.email === session.email; }) || null;
+        var user = session.user;
+        return {
+            nom: (user.user_metadata && user.user_metadata.nom) || user.email,
+            email: user.email
+        };
     }
 
     // Prévient le reste du site (ex: page "Mon compte") qu'une connexion /
@@ -91,6 +117,8 @@
         loginUser: loginUser,
         logoutUser: logoutUser,
         getCurrentUser: getCurrentUser,
+        requestPasswordReset: requestPasswordReset,
+        updatePassword: updatePassword,
         notifyAuthChange: notifyAuthChange
     };
 
@@ -100,7 +128,7 @@
        ouverte au clic sur le bouton "Se connecter" du menu.
        ========================================================= */
 
-    var modalOverlay, modalLoginForm, modalRegisterForm, modalMessage, tabButtons;
+    var modalOverlay, modalLoginForm, modalRegisterForm, modalForgotForm, modalMessage, tabButtons, modalTabsRow;
 
     function buildModal() {
         if (document.getElementById('authModalOverlay')) return;
@@ -126,6 +154,7 @@
                             '<input type="password" id="modalLoginPassword" placeholder="••••••••" required>' +
                         '</div>' +
                         '<button type="submit" class="btn-submit">Se connecter</button>' +
+                        '<p class="auth-switch" style="margin-top:16px;"><a href="#" id="modalForgotLink">Mot de passe oublié ?</a></p>' +
                     '</form>' +
                     '<form id="modalRegisterForm" class="auth-modal-form" novalidate hidden>' +
                         '<div class="form-field">' +
@@ -146,6 +175,14 @@
                         '</div>' +
                         '<button type="submit" class="btn-submit">Créer mon compte</button>' +
                     '</form>' +
+                    '<form id="modalForgotForm" class="auth-modal-form" novalidate hidden>' +
+                        '<div class="form-field">' +
+                            '<label for="modalForgotEmail">Email</label>' +
+                            '<input type="email" id="modalForgotEmail" placeholder="vous@exemple.com" required>' +
+                        '</div>' +
+                        '<button type="submit" class="btn-submit">Envoyer le lien de réinitialisation</button>' +
+                        '<p class="auth-switch" style="margin-top:16px;"><a href="#" id="modalForgotBack">Retour à la connexion</a></p>' +
+                    '</form>' +
                 '</div>' +
             '</div>';
 
@@ -154,8 +191,10 @@
         modalOverlay = document.getElementById('authModalOverlay');
         modalLoginForm = document.getElementById('modalLoginForm');
         modalRegisterForm = document.getElementById('modalRegisterForm');
+        modalForgotForm = document.getElementById('modalForgotForm');
         modalMessage = document.getElementById('authModalMessage');
         tabButtons = modalOverlay.querySelectorAll('.auth-tab');
+        modalTabsRow = modalOverlay.querySelector('.auth-modal-tabs');
 
         document.getElementById('authModalClose').addEventListener('click', closeAuthModal);
         modalOverlay.addEventListener('click', function (e) {
@@ -169,6 +208,15 @@
             btn.addEventListener('click', function () {
                 showAuthTab(btn.getAttribute('data-tab'));
             });
+        });
+
+        document.getElementById('modalForgotLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            showAuthTab('forgot');
+        });
+        document.getElementById('modalForgotBack').addEventListener('click', function (e) {
+            e.preventDefault();
+            showAuthTab('login');
         });
 
         function setModalMessage(text, type) {
@@ -202,11 +250,27 @@
                 return;
             }
 
-            registerUser(nom, email, password).then(function () {
-                setModalMessage('Compte créé avec succès.', 'success');
-                updateSignInButton();
-                notifyAuthChange();
-                setTimeout(closeAuthModal, 500);
+            registerUser(nom, email, password).then(function (result) {
+                if (result.needsConfirmation) {
+                    setModalMessage('Compte créé. Vérifiez votre boîte mail pour confirmer votre adresse avant de vous connecter.', 'success');
+                    setTimeout(function () { showAuthTab('login'); }, 2200);
+                } else {
+                    setModalMessage('Compte créé avec succès.', 'success');
+                    updateSignInButton();
+                    notifyAuthChange();
+                    setTimeout(closeAuthModal, 500);
+                }
+            }).catch(function (err) {
+                setModalMessage(err.message, 'error');
+            });
+        });
+
+        modalForgotForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = document.getElementById('modalForgotEmail').value;
+
+            requestPasswordReset(email).then(function () {
+                setModalMessage('Un lien de réinitialisation a été envoyé à ' + email + '. Vérifiez votre boîte mail.', 'success');
             }).catch(function (err) {
                 setModalMessage(err.message, 'error');
             });
@@ -218,13 +282,10 @@
             btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
         });
         modalMessage.innerHTML = '';
-        if (tab === 'register') {
-            modalLoginForm.hidden = true;
-            modalRegisterForm.hidden = false;
-        } else {
-            modalRegisterForm.hidden = true;
-            modalLoginForm.hidden = false;
-        }
+        modalTabsRow.style.display = (tab === 'forgot') ? 'none' : '';
+        modalLoginForm.hidden = tab !== 'login';
+        modalRegisterForm.hidden = tab !== 'register';
+        modalForgotForm.hidden = tab !== 'forgot';
     }
 
     function openAuthModal(tab) {
@@ -248,13 +309,13 @@
     window.AvolazaAuth.closeModal = closeAuthModal;
 
     // Met à jour le bouton "Se connecter" du menu selon l'état de connexion.
-    function updateSignInButton() {
+    async function updateSignInButton() {
         var actions = document.querySelector('.nav-actions');
         if (!actions) return;
         var btn = actions.querySelector('.btn-signin');
         if (!btn) return;
 
-        var user = getCurrentUser();
+        var user = await getCurrentUser();
         if (user) {
             btn.textContent = 'Mon compte';
             btn.setAttribute('href', actions.getAttribute('data-account-href') || '#');
@@ -282,13 +343,18 @@
         if (!btn) return;
 
         var hasOwnAuthForm = !!(document.getElementById('loginForm') || document.getElementById('registerForm'));
+        if (hasOwnAuthForm) return; // navigation par défaut conservée
 
         btn.addEventListener('click', function (e) {
-            var user = getCurrentUser();
-            if (!user && !hasOwnAuthForm) {
-                e.preventDefault();
-                openAuthModal('login');
-            }
+            e.preventDefault();
+            var href = btn.getAttribute('href');
+            getCurrentUser().then(function (user) {
+                if (user) {
+                    window.location.href = href;
+                } else {
+                    openAuthModal('login');
+                }
+            });
         });
     });
 })();

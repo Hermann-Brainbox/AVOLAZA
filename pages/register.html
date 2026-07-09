@@ -94,11 +94,18 @@
                     return;
                 }
 
-                window.AvolazaAuth.registerUser(nom, email, password).then(function () {
-                    showMessage('Compte créé avec succès. Redirection...', 'success');
-                    setTimeout(function () {
-                        window.location.href = 'compte.html';
-                    }, 600);
+                window.AvolazaAuth.registerUser(nom, email, password).then(function (result) {
+                    if (result.needsConfirmation) {
+                        showMessage('Compte créé. Vérifiez votre boîte mail pour confirmer votre adresse, puis connectez-vous.', 'success');
+                        setTimeout(function () {
+                            window.location.href = 'login.html';
+                        }, 2500);
+                    } else {
+                        showMessage('Compte créé avec succès. Redirection...', 'success');
+                        setTimeout(function () {
+                            window.location.href = 'compte.html';
+                        }, 600);
+                    }
                 }).catch(function (err) {
                     showMessage(err.message, 'error');
                 });
@@ -107,6 +114,7 @@
     </script>
 
     <script src="../js/nav.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/auth.js"></script>
 </body>
 </html>

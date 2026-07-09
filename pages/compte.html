@@ -66,6 +66,7 @@
     </main>
 
     <script src="../js/nav.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/auth.js"></script>
     <script>
         (function () {
@@ -79,34 +80,31 @@
             }
 
             function render() {
-                var user = window.AvolazaAuth.getCurrentUser();
-                if (user) {
-                    guestShell.hidden = true;
-                    accountShell.hidden = false;
-                    document.getElementById('accountAvatar').textContent = initials(user.nom);
-                    document.getElementById('accountName').textContent = user.nom;
-                    document.getElementById('accountEmail').textContent = user.email;
-                } else {
-                    accountShell.hidden = true;
-                    guestShell.hidden = false;
-                }
+                window.AvolazaAuth.getCurrentUser().then(function (user) {
+                    if (user) {
+                        guestShell.hidden = true;
+                        accountShell.hidden = false;
+                        document.getElementById('accountAvatar').textContent = initials(user.nom);
+                        document.getElementById('accountName').textContent = user.nom;
+                        document.getElementById('accountEmail').textContent = user.email;
+                    } else {
+                        accountShell.hidden = true;
+                        guestShell.hidden = false;
+                        window.AvolazaAuth.openModal('login');
+                    }
+                });
             }
 
             render();
-
-            // Si l'utilisateur arrive ici sans être connecté, on ouvre directement
-            // la popup de connexion plutôt que de le rediriger vers une autre page.
-            if (!window.AvolazaAuth.getCurrentUser()) {
-                window.AvolazaAuth.openModal('login');
-            }
 
             document.getElementById('openLoginBtn').addEventListener('click', function () {
                 window.AvolazaAuth.openModal('login');
             });
 
             document.getElementById('logoutBtn').addEventListener('click', function () {
-                window.AvolazaAuth.logoutUser();
-                window.AvolazaAuth.notifyAuthChange();
+                window.AvolazaAuth.logoutUser().then(function () {
+                    window.AvolazaAuth.notifyAuthChange();
+                });
             });
 
             // Se met à jour dès qu'une connexion/inscription/déconnexion a lieu,

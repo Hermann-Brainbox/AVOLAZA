@@ -58,6 +58,16 @@
                         <input type="password" id="password" name="password" placeholder="••••••••" required>
                     </div>
                     <button type="submit" class="btn-submit">Se connecter</button>
+                    <p class="auth-switch" style="margin-top:16px;"><a href="#" id="forgotLink">Mot de passe oublié ?</a></p>
+                </form>
+
+                <form id="forgotForm" novalidate hidden>
+                    <div class="form-field">
+                        <label for="forgotEmail">Email</label>
+                        <input type="email" id="forgotEmail" name="forgotEmail" placeholder="vous@exemple.com" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Envoyer le lien de réinitialisation</button>
+                    <p class="auth-switch" style="margin-top:16px;"><a href="#" id="forgotBack">Retour à la connexion</a></p>
                 </form>
             </div>
 
@@ -69,6 +79,9 @@
         (function () {
             var form = document.getElementById('loginForm');
             var messageBox = document.getElementById('loginMessage');
+            var forgotForm = document.getElementById('forgotForm');
+            var forgotLink = document.getElementById('forgotLink');
+            var forgotBack = document.getElementById('forgotBack');
 
             function showMessage(text, type) {
                 messageBox.innerHTML = '<div class="form-message ' + type + '">' + text + '</div>';
@@ -88,10 +101,36 @@
                     showMessage(err.message, 'error');
                 });
             });
+
+            forgotLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                messageBox.innerHTML = '';
+                form.hidden = true;
+                forgotForm.hidden = false;
+            });
+
+            forgotBack.addEventListener('click', function (e) {
+                e.preventDefault();
+                messageBox.innerHTML = '';
+                forgotForm.hidden = true;
+                form.hidden = false;
+            });
+
+            forgotForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var email = document.getElementById('forgotEmail').value;
+
+                window.AvolazaAuth.requestPasswordReset(email).then(function () {
+                    showMessage('Un lien de réinitialisation a été envoyé à ' + email + '. Vérifiez votre boîte mail.', 'success');
+                }).catch(function (err) {
+                    showMessage(err.message, 'error');
+                });
+            });
         })();
     </script>
 
     <script src="../js/nav.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/auth.js"></script>
 </body>
 </html>

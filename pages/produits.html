@@ -53,6 +53,7 @@
                 data-name="Rhum AVOLAZA"
                 data-tag="Distillé et arrangé avec caractère"
                 data-img="../images/rhum-avolaza.jpg"
+                data-price="Prix sur demande"
                 data-desc="Notre rhum est distillé selon un savoir-faire artisanal transmis de génération en génération, puis arrangé avec des épices et fruits locaux pour révéler des arômes authentiques. Chaque bouteille est le fruit d'un vieillissement patient qui affine son caractère et sa rondeur en bouche. Un produit à partager, à savourer pur ou en cocktail.">
                 <div class="product-photo">
                     <img src="../images/rhum-avolaza.jpg" alt="Bouteille de Rhum AVOLAZA" onerror="this.style.display='none'; this.parentElement.classList.add('photo-missing')">
@@ -60,6 +61,7 @@
                 </div>
                 <h2 class="product-name">Rhum AVOLAZA</h2>
                 <p class="product-desc">Distillé et arrangé avec caractère.</p>
+                <p class="product-price">Prix sur demande</p>
                 <div class="product-actions">
                     <button type="button" class="btn-details" data-open-modal>Voir le détail</button>
                     <a href="contact.html" class="btn-order">Passer votre commande</a>
@@ -70,6 +72,7 @@
                 data-name="Huile Coco AVOLAZA"
                 data-tag="Pressée à froid, pure et naturelle"
                 data-img="../images/huile-coco-avolaza.jpg"
+                data-price="Prix sur demande"
                 data-desc="Extraite par première pression à froid à partir de noix de coco sélectionnées, notre huile conserve toutes ses propriétés nutritives et son parfum délicat. Sans additif ni raffinage, elle convient aussi bien à la cuisine qu'aux soins de la peau et des cheveux. Un produit 100% naturel, fidèle à sa terre d'origine.">
                 <div class="product-photo">
                     <img src="../images/huile-coco-avolaza.jpg" alt="Bouteille d'Huile de Coco AVOLAZA" onerror="this.style.display='none'; this.parentElement.classList.add('photo-missing')">
@@ -77,6 +80,7 @@
                 </div>
                 <h2 class="product-name">Huile Coco AVOLAZA</h2>
                 <p class="product-desc">Pressée à froid, pure et naturelle.</p>
+                <p class="product-price">Prix sur demande</p>
                 <div class="product-actions">
                     <button type="button" class="btn-details" data-open-modal>Voir le détail</button>
                     <a href="contact.html" class="btn-order">Passer votre commande</a>
@@ -87,6 +91,7 @@
                 data-name="Miel AVOLAZA"
                 data-tag="Récolté brut, des hauts plateaux"
                 data-img="../images/miel-avolaza.png"
+                data-price="Prix sur demande"
                 data-desc="Récolté brut auprès d'apiculteurs des hauts plateaux malgaches, notre miel n'est ni chauffé ni filtré à l'excès afin de préserver ses enzymes, ses arômes floraux et ses bienfaits naturels. Chaque pot reflète la diversité florale de sa région de récolte, pour une expérience gustative unique à chaque saison.">
                 <div class="product-photo">
                     <img src="../images/miel-avolaza.png" alt="Pot de Miel AVOLAZA" onerror="this.style.display='none'; this.parentElement.classList.add('photo-missing')">
@@ -94,6 +99,7 @@
                 </div>
                 <h2 class="product-name">Miel AVOLAZA</h2>
                 <p class="product-desc">Récolté brut, des hauts plateaux.</p>
+                <p class="product-price">Prix sur demande</p>
                 <div class="product-actions">
                     <button type="button" class="btn-details" data-open-modal>Voir le détail</button>
                     <a href="contact.html" class="btn-order">Passer votre commande</a>
@@ -104,6 +110,7 @@
                 data-name="Café AVOLAZA"
                 data-tag="Récolté et torréfié à la main"
                 data-img="../images/cafe-avolaza.jpeg"
+                data-price="Prix sur demande"
                 data-desc="Cultivé en altitude puis récolté à la main grain par grain, notre café est torréfié en petites quantités pour révéler un profil aromatique riche et équilibré. Une tasse qui raconte le terroir malgache, du plant à la torréfaction, pensée pour les amateurs exigeants.">
                 <div class="product-photo">
                     <img src="../images/cafe-avolaza.jpeg" alt="Paquet de Café AVOLAZA" onerror="this.style.display='none'; this.parentElement.classList.add('photo-missing')">
@@ -111,6 +118,7 @@
                 </div>
                 <h2 class="product-name">Café AVOLAZA</h2>
                 <p class="product-desc">Récolté et torréfié à la main.</p>
+                <p class="product-price">Prix sur demande</p>
                 <div class="product-actions">
                     <button type="button" class="btn-details" data-open-modal>Voir le détail</button>
                     <a href="contact.html" class="btn-order">Passer votre commande</a>
@@ -129,12 +137,14 @@
             </div>
             <h2 class="product-modal-name" id="productModalName"></h2>
             <p class="product-modal-tag" id="productModalTag"></p>
+            <p class="product-modal-price" id="productModalPrice"></p>
             <p class="product-modal-desc" id="productModalDesc"></p>
             <a href="contact.html" class="btn-contact" id="productModalContact">Passer votre commande →</a>
         </div>
     </div>
 
     <script src="../js/nav.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/products.js"></script>
 </body>
